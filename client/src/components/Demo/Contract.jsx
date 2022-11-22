@@ -1,68 +1,39 @@
 import { useRef, useEffect, useState } from "react";
 import useEth from "../../contexts/EthContext/useEth";
 
-function Contract({ value, text }) {
+function Contract({  session, winner }) {
   const spanEle = useRef(null);
-  const [EventValue, setEventValue] = useState("");
-  const [oldEvents, setOldEvents] = useState();
+  //const [EventValue, setEventValue] = useState("");
+  //const [oldEvents, setOldEvents] = useState();
  
-  const { state: { contract } } = useEth();
+  const { state: { contract, accounts } } = useEth();
 
-  useEffect(() => {
-    (async function () {
- 
-       let oldEvents= await contract.getPastEvents('valueChanged', {
-          fromBlock: 0,
-          toBlock: 'latest'
-        });
-        let oldies=[];
-        oldEvents.forEach(event => {
-            oldies.push(event.returnValues._val);
-        });
-        setOldEvents(oldies);
- 
-        await contract.events.valueChanged({fromBlock:"earliest"})
-        .on('data', event => {
-          let lesevents = event.returnValues._val;
-          setEventValue(lesevents);
-        })          
-        .on('changed', changed => console.log(changed))
-        .on('error', err => console.log(err))
-        .on('connected', str => console.log(str))
-    })();
-  }, [contract])
+  
+
 
   return (
     <code>
-      {`contract SimpleStorage {
-  uint256 value = `}
+          <div className="addr">
+        Your Address:
+        <br />
+        {accounts && accounts[0] && <pre>{accounts[0]}</pre>}
+    </div>
 
-      <span className="secondary-color" ref={spanEle}>
-        <strong>{value}</strong>
-      </span>
-
-      {`;
-  
-  string greet = `}
-
-      <span className="secondary-color" ref={spanEle}>
-        <strong>{text}</strong>
-      </span>
-
-      {`;
-
-  function read() public view returns (uint256) {
-    return value;
-  }
-
-  function write(uint256 newValue) public {
-    value = newValue;
-  }
-}
-  Events arriving: `} {EventValue} {`
- 
-  Old events: `} {oldEvents}
-    </code>
+    <div>
+  Session : 
+<span className="secondary-color" ref={spanEle}>
+  <strong>{session}</strong>
+</span>
+</div>
+<h3>
+  Winner : 
+  </h3>
+  <div>
+<span className="secondary-color" ref={spanEle}>
+  <strong>{winner}</strong>
+</span>
+</div>
+  </code>
   );
 }
 
